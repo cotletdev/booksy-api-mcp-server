@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "booksy": {
+      "command": "/path/to/booksy-api-mcp-server/.venv/bin/booksy-mcp",
+      "args": ["mcp"]
+    }
+  }
+}
