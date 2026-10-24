@@ -8,13 +8,13 @@ Booksy has no self-serve API for business owners and no official MCP server. Thi
 
 - **MCP server** for Claude Code, Claude Desktop, Cursor, Codex and any MCP client, over stdio or HTTP. [Setup](#mcp-server)
 - **REST API** on `http://127.0.0.1:8787/api/v1/booksy`, with OpenAPI docs at `/docs`. [Setup](#rest-api)
-- **Python**: `call("list_appointments", {"from": "2026-10-27", "to": "2026-10-27"})`, plus 9 ready scripts in [`examples/`](examples/).
+- **Python**: `call("list_appointments", {"from": "2026-10-27", "to": "2026-10-27"})`, plus 9 ready scripts in [`examples/`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/).
 
 It is for technical people who want to run it themselves, **for noncommercial use only** ([license](#license)). If you want it running 24/7 on a server, kept working when Booksy changes its panel, for a team or a business, use the [hosted version at cotlet.dev](https://cotlet.dev/integrations/booksy-api-mcp-server).
 
 [![Booksy MCP server](https://img.shields.io/badge/Booksy%20MCP-28%20tools-6d4aef)](#all-28-tools)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-141318)](#requirements)
-[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial-141318)](LICENSE)
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial-141318)](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/LICENSE)
 [![MCP Badge](https://lobehub.com/badge/mcp/cotletdev-booksy-api-mcp-server)](https://lobehub.com/mcp/cotletdev-booksy-api-mcp-server)
 
 ```bash
@@ -86,7 +86,7 @@ booksy-mcp --version
 
 With [uv](https://docs.astral.sh/uv/): `uv venv && uv pip install -e .`, then `uv run booksy-mcp ...`.
 
-Setting it up with an AI agent (Claude Code, Codex, Cursor)? Open it in this folder and ask it to set up the repo: [`AGENTS.md`](AGENTS.md) tells it every step, and it asks you only for the steps in Chrome.
+Setting it up with an AI agent (Claude Code, Codex, Cursor)? Open it in this folder and ask it to set up the repo: [`AGENTS.md`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/AGENTS.md) tells it every step, and it asks you only for the steps in Chrome.
 
 To update: `uv tool upgrade booksy-api-mcp` (or `pip install -U booksy-api-mcp`), from source `git pull && pip install -e .`. We copy every change of the hosted Booksy tools into this repo.
 
@@ -167,7 +167,7 @@ claude mcp add booksy -- uvx booksy-api-mcp mcp --read-only
 
 ### Cursor
 
-`~/.cursor/mcp.json`, the same block as Claude Desktop. A ready copy is in [`mcp.json`](mcp.json).
+`~/.cursor/mcp.json`, the same block as Claude Desktop. A ready copy is in [`mcp.json`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/mcp.json).
 
 ### Codex
 
@@ -250,19 +250,19 @@ Or one tool from the shell: `booksy-mcp call find_open_slots service_id=8307205 
 
 Times are local to the business. A date-time without a zone is read in the business's time zone, and answers carry its offset.
 
-Ready scripts in [`examples/`](examples/). Each prints JSON or a short list, takes `--out file.csv` or `--out file.json` where it makes sense, and `--help`:
+Ready scripts in [`examples/`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/). Each prints JSON or a short list, takes `--out file.csv` or `--out file.json` where it makes sense, and `--help`:
 
 | Script | What it does |
 |---|---|
-| [`tomorrows_appointments.py`](examples/tomorrows_appointments.py) | Tomorrow's appointments, one line each, and the open slots left for a service. `--date`, `--staff-id`. |
-| [`reschedule_day.py`](examples/reschedule_day.py) | Moves one staff member's appointments on a day to colleagues free within an hour of the original time. Prints the plan; `--apply` moves them, asking each time. |
-| [`block_time_off.py`](examples/block_time_off.py) | Adds whole days off or blocks hours on one day, or removes a time off. |
-| [`export_clients.py`](examples/export_clients.py) | Clients to CSV or JSON: contact, note, visits, no-shows, revenue, last visit. `--search`, `--not-visited-days`. |
-| [`lapsed_clients.py`](examples/lapsed_clients.py) | Clients not seen for N days, minus anyone booked in the next 30 days. |
-| [`win_back_blast.py`](examples/win_back_blast.py) | One Message Blast to those lapsed clients, after it shows the reach and SMS cost and asks. |
-| [`weekly_staff_report.py`](examples/weekly_staff_report.py) | Appointments and revenue per staff member, last week against the week before, big moves flagged. |
-| [`unanswered_reviews.py`](examples/unanswered_reviews.py) | Reviews without a reply, lowest rating first; `--reply-to` posts a reply. |
-| [`add_client.py`](examples/add_client.py) | Adds a client card with no invitation, or a note to an existing one. |
+| [`tomorrows_appointments.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/tomorrows_appointments.py) | Tomorrow's appointments, one line each, and the open slots left for a service. `--date`, `--staff-id`. |
+| [`reschedule_day.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/reschedule_day.py) | Moves one staff member's appointments on a day to colleagues free within an hour of the original time. Prints the plan; `--apply` moves them, asking each time. |
+| [`block_time_off.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/block_time_off.py) | Adds whole days off or blocks hours on one day, or removes a time off. |
+| [`export_clients.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/export_clients.py) | Clients to CSV or JSON: contact, note, visits, no-shows, revenue, last visit. `--search`, `--not-visited-days`. |
+| [`lapsed_clients.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/lapsed_clients.py) | Clients not seen for N days, minus anyone booked in the next 30 days. |
+| [`win_back_blast.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/win_back_blast.py) | One Message Blast to those lapsed clients, after it shows the reach and SMS cost and asks. |
+| [`weekly_staff_report.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/weekly_staff_report.py) | Appointments and revenue per staff member, last week against the week before, big moves flagged. |
+| [`unanswered_reviews.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/unanswered_reviews.py) | Reviews without a reply, lowest rating first; `--reply-to` posts a reply. |
+| [`add_client.py`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/add_client.py) | Adds a client card with no invitation, or a note to an existing one. |
 
 ```bash
 python examples/tomorrows_appointments.py --open-slots-for 8307205
@@ -439,7 +439,7 @@ The source is public, the license is not an open source license: noncommercial u
 
 ## License
 
-[PolyForm Noncommercial License 1.0.0](LICENSE). In short:
+[PolyForm Noncommercial License 1.0.0](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/LICENSE). In short:
 
 - **Allowed:** noncommercial use: you, for your own personal purposes with your own Booksy account, or a charity, school, public research or government body. Changing the code, and sharing it under the same license.
 - **Not allowed:** any commercial use, your own business included; client work; selling or offering it, or a service built on it.
@@ -450,7 +450,7 @@ The source is public, the license is not an open source license: noncommercial u
   <a href="https://cotlet.dev">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="assets/logo-white.svg">
-      <img src="assets/logo.svg" alt="Cotlet" width="120">
+      <img src="https://raw.githubusercontent.com/cotletdev/booksy-api-mcp-server/main/assets/logo.svg" alt="Cotlet" width="120">
     </picture>
   </a>
 </p>
