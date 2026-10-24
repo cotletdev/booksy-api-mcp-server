@@ -3,9 +3,7 @@
     "booksy": {
       "command": "uvx",
       "args": [
-        "--from",
         "booksy-api-mcp",
-        "booksy-mcp",
         "mcp"
       ]
     }

@@ -1,5 +1,7 @@
 # Booksy API and MCP server, self-hosted
 
+<!-- mcp-name: dev.cotlet/booksy -->
+
 A **Booksy API** and a **Booksy MCP server** you run on your own computer, in Python, on the session of your own Google Chrome. All 28 Booksy Biz tools we run in production at [Cotlet](https://cotlet.dev/integrations/booksy-api-mcp-server): the calendar, open slots, time off, clients, services and staff, reviews, Message Blasts and Stats & Reports.
 
 Booksy has no self-serve API for business owners and no official MCP server. This repo gives you both:
@@ -19,7 +21,7 @@ It is for technical people who want to run it themselves, **for noncommercial us
 uv tool install booksy-api-mcp                  # or: pip install booksy-api-mcp
 booksy-mcp connect                                 # reads your Booksy Biz session from Chrome
 booksy-mcp call list_services
-claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp
+claude mcp add booksy -- uvx booksy-api-mcp mcp
 ```
 
 ## Contents
@@ -69,7 +71,7 @@ uv tool install booksy-api-mcp       # or: pipx install booksy-api-mcp, or: pip 
 booksy-mcp --version
 ```
 
-MCP clients can also run it with no install: `uvx --from booksy-api-mcp booksy-mcp mcp`.
+MCP clients can also run it with no install: `uvx booksy-api-mcp mcp`.
 
 From source:
 
@@ -143,9 +145,9 @@ The MCP server lists every tool with its input schema, a description written for
 ### Claude Code
 
 ```bash
-claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp
+claude mcp add booksy -- uvx booksy-api-mcp mcp
 # read only:
-claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp --read-only
+claude mcp add booksy -- uvx booksy-api-mcp mcp --read-only
 ```
 
 ### Claude Desktop
@@ -157,7 +159,7 @@ claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp --read-only
   "mcpServers": {
     "booksy": {
       "command": "uvx",
-      "args": ["--from", "booksy-api-mcp", "booksy-mcp", "mcp"]
+      "args": ["booksy-api-mcp", "mcp"]
     }
   }
 }
@@ -174,7 +176,7 @@ claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp --read-only
 ```toml
 [mcp_servers.booksy]
 command = "uvx"
-args = ["--from", "booksy-api-mcp", "booksy-mcp", "mcp"]
+args = ["booksy-api-mcp", "mcp"]
 ```
 
 ### Over HTTP
