@@ -16,11 +16,10 @@ It is for technical people who want to run it themselves, **for noncommercial us
 [![MCP Badge](https://lobehub.com/badge/mcp/cotletdev-booksy-api-mcp-server)](https://lobehub.com/mcp/cotletdev-booksy-api-mcp-server)
 
 ```bash
-git clone https://github.com/cotletdev/booksy-api-mcp-server.git && cd booksy-api-mcp-server
-python3 -m venv .venv && . .venv/bin/activate && pip install -e .
+uv tool install booksy-api-mcp                  # or: pip install booksy-api-mcp
 booksy-mcp connect                                 # reads your Booksy Biz session from Chrome
 booksy-mcp call list_services
-claude mcp add booksy -- "$PWD/.venv/bin/booksy-mcp" mcp
+claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp
 ```
 
 ## Contents
@@ -63,6 +62,17 @@ When Booksy signs you out, the server reads the session from Chrome again, if Ch
 
 ## Install
 
+From [PyPI](https://pypi.org/project/booksy-api-mcp/):
+
+```bash
+uv tool install booksy-api-mcp       # or: pipx install booksy-api-mcp, or: pip install booksy-api-mcp
+booksy-mcp --version
+```
+
+MCP clients can also run it with no install: `uvx --from booksy-api-mcp booksy-mcp mcp`.
+
+From source:
+
 ```bash
 git clone https://github.com/cotletdev/booksy-api-mcp-server.git
 cd booksy-api-mcp-server
@@ -76,7 +86,7 @@ With [uv](https://docs.astral.sh/uv/): `uv venv && uv pip install -e .`, then `u
 
 Setting it up with an AI agent (Claude Code, Codex, Cursor)? Open it in this folder and ask it to set up the repo: [`AGENTS.md`](AGENTS.md) tells it every step, and it asks you only for the steps in Chrome.
 
-To update: `git pull && pip install -e .`. We copy every change of the hosted Booksy tools into this repo.
+To update: `uv tool upgrade booksy-api-mcp` (or `pip install -U booksy-api-mcp`), from source `git pull && pip install -e .`. We copy every change of the hosted Booksy tools into this repo.
 
 ## Connect your Chrome
 
@@ -133,9 +143,9 @@ The MCP server lists every tool with its input schema, a description written for
 ### Claude Code
 
 ```bash
-claude mcp add booksy -- /path/to/booksy-api-mcp-server/.venv/bin/booksy-mcp mcp
+claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp
 # read only:
-claude mcp add booksy -- /path/to/booksy-api-mcp-server/.venv/bin/booksy-mcp mcp --read-only
+claude mcp add booksy -- uvx --from booksy-api-mcp booksy-mcp mcp --read-only
 ```
 
 ### Claude Desktop
@@ -146,8 +156,8 @@ claude mcp add booksy -- /path/to/booksy-api-mcp-server/.venv/bin/booksy-mcp mcp
 {
   "mcpServers": {
     "booksy": {
-      "command": "/path/to/booksy-api-mcp-server/.venv/bin/booksy-mcp",
-      "args": ["mcp"]
+      "command": "uvx",
+      "args": ["--from", "booksy-api-mcp", "booksy-mcp", "mcp"]
     }
   }
 }
@@ -163,8 +173,8 @@ claude mcp add booksy -- /path/to/booksy-api-mcp-server/.venv/bin/booksy-mcp mcp
 
 ```toml
 [mcp_servers.booksy]
-command = "/path/to/booksy-api-mcp-server/.venv/bin/booksy-mcp"
-args = ["mcp"]
+command = "uvx"
+args = ["--from", "booksy-api-mcp", "booksy-mcp", "mcp"]
 ```
 
 ### Over HTTP
