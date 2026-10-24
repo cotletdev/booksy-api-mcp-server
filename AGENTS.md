@@ -66,7 +66,7 @@ Errors come as `<code>: <message>`. `auth_expired` means Booksy signed the sessi
 | `booksy_api_mcp/app.py` | app name, domains, where the session lives, account paths, REST prefix | Rarely |
 | `booksy_api_mcp/core/` | `@tool` declaration, errors, the account guard, the HTTP client with the session (`context.py`) | Yes |
 | `booksy_api_mcp/session.py` | reading cookies and localStorage from Chrome over CDP, the session file | Yes |
-| `booksy_api_mcp/runner.py`, `api.py`, `mcp_server.py`, `cli.py` | tool registry, REST API, MCP server, command line | Yes |
+| `booksy_api_mcp/runner.py`, `api.py`, `mcp_server.py`, `mcp_context.py`, `cli.py` | tool registry, REST API, MCP server, its prompts and resources, command line | Yes |
 | `examples/` | scripts for common jobs | Yes |
 
 A new tool is a new file in `booksy_api_mcp/booksy/tools/` with a `@tool(...)` declaration (name, access, input schema, `route`). The registry finds it, and the REST API, the MCP server and the CLI show it without other changes.

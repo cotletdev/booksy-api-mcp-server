@@ -13,6 +13,7 @@ It is for technical people who want to run it themselves, **for noncommercial us
 [![Booksy MCP server](https://img.shields.io/badge/Booksy%20MCP-28%20tools-6d4aef)](#all-28-tools)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-141318)](#requirements)
 [![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial-141318)](LICENSE)
+[![MCP Badge](https://lobehub.com/badge/mcp/cotletdev-booksy-api-mcp-server)](https://lobehub.com/mcp/cotletdev-booksy-api-mcp-server)
 
 ```bash
 git clone https://github.com/cotletdev/booksy-api-mcp-server.git && cd booksy-api-mcp-server
