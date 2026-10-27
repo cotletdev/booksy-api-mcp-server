@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from booksy_api_mcp.booksy.calendar import (
@@ -22,14 +22,35 @@ from booksy_api_mcp.core.tools import tool
 if TYPE_CHECKING:
     from booksy_api_mcp.core.context import ToolContext
 
+# Several services in one appointment, each with its own staff member, booked back to back (Booksy's subbookings).
+SERVICES_SCHEMA: dict[str, Any] = {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 10,
+    "description": "Services of the appointment in order, each starting when the one before ends.",
+    "items": {
+        "type": "object",
+        "properties": {
+            "service_id": {"type": "string", "description": "service_id or variant_id from list_services."},
+            "staff_id": {
+                "type": "string",
+                "description": "Staff ID from list_staff. Default: the first one who offers the service.",
+            },
+        },
+        "required": ["service_id"],
+        "additionalProperties": False,
+    },
+}
+
 INPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
         "client_id": {"type": "string", "description": "Client ID from list_clients or add_client."},
         "service_id": {
             "type": "string",
-            "description": "service_id from list_services (its first variant), or a variant_id.",
+            "description": "service_id from list_services (its first variant), or a variant_id. Or use services.",
         },
+        "services": SERVICES_SCHEMA,
         "start": {
             "type": "string",
             "format": "date-time",
@@ -37,7 +58,7 @@ INPUT_SCHEMA: dict[str, Any] = {
         },
         "staff_id": {
             "type": "string",
-            "description": "Staff ID from list_staff. Default: the first one who offers the service.",
+            "description": "Staff ID from list_staff, with service_id. Default: the first one who offers the service.",
         },
         "note": {"type": "string", "description": "Internal note, only staff see it."},
         "notify_client": {
@@ -49,7 +70,7 @@ INPUT_SCHEMA: dict[str, Any] = {
             "description": "Only check the time and price; nothing is saved. Default: false.",
         },
     },
-    "required": ["client_id", "service_id", "start"],
+    "required": ["client_id", "start"],
     "additionalProperties": False,
 }
 
@@ -81,19 +102,28 @@ EXAMPLE_RESPONSE: dict[str, Any] = {
 }
 
 
-async def booking(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
-    """The body the panel sends for a new appointment."""
-    zone = await business_zone(ctx)
-    service, variant = await service_variant(ctx, args["service_id"])
-    staffers = variant.get("staffers") or service.get("resources") or []
-    staff = int_id(args["staff_id"], "staff_id") if args.get("staff_id") else (staffers[0] if staffers else None)
-    if staff is None:
-        raise ToolError("No staff member offers this service.", ErrorCode.INVALID_INPUT)
-    start = local(args["start"], zone)
-    end = start + timedelta(minutes=int(variant.get("duration") or 0))
-    return {
-        "customer": {"mode": "customer-card", "id": int_id(args["client_id"], "client_id")},
-        "subbookings": [
+def wanted_services(args: dict[str, Any]) -> list[dict[str, Any]]:
+    """`services`, or the single `service_id` with `staff_id`; exactly one of the two."""
+    if bool(args.get("services")) == bool(args.get("service_id")):
+        raise ToolError("Give either service_id or services.", ErrorCode.INVALID_INPUT)
+    if args.get("services"):
+        if args.get("staff_id"):
+            raise ToolError("With services, give staff_id inside each service.", ErrorCode.INVALID_INPUT)
+        return list(args["services"])
+    return [{"service_id": args["service_id"], "staff_id": args.get("staff_id")}]
+
+
+async def segments(ctx: ToolContext, services: list[dict[str, Any]], start: datetime) -> list[dict[str, Any]]:
+    """New subbookings for `services`, back to back from `start`, as the panel sends them."""
+    out: list[dict[str, Any]] = []
+    for item in services:
+        service, variant = await service_variant(ctx, item["service_id"])
+        staffers = variant.get("staffers") or service.get("resources") or []
+        staff = int_id(item["staff_id"], "staff_id") if item.get("staff_id") else (staffers[0] if staffers else None)
+        if staff is None:
+            raise ToolError(f"No staff member offers {service.get('name') or 'this service'}.", ErrorCode.INVALID_INPUT)
+        end = start + timedelta(minutes=int(variant.get("duration") or 0))
+        out.append(
             {
                 "booked_from": stamp(start),
                 "booked_till": stamp(end),
@@ -103,7 +133,17 @@ async def booking(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
                 "autoassign": False,
                 "addons": [],
             }
-        ],
+        )
+        start = end
+    return out
+
+
+async def booking(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    """The body the panel sends for a new appointment."""
+    zone = await business_zone(ctx)
+    return {
+        "customer": {"mode": "customer-card", "id": int_id(args["client_id"], "client_id")},
+        "subbookings": await segments(ctx, wanted_services(args), local(args["start"], zone)),
         "business_note": "",
         "business_secret_note": args.get("note") or "",
         "overbooking": False,
@@ -114,7 +154,7 @@ async def booking(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
 
 
 def unavailable(appointment: dict[str, Any]) -> str | None:
-    """Booksy's reason the chosen staff member cannot take the slot, from the dry run."""
+    """Booksy's reason a chosen staff member cannot take their slot, from the dry run."""
     for sub in appointment.get("subbookings") or []:
         staffers = (sub.get("_availability") or {}).get("staffers") or {}
         found = staffers.get(str(sub.get("staffer_id")))
@@ -128,10 +168,11 @@ def unavailable(appointment: dict[str, Any]) -> str | None:
     title="Create appointment",
     access="write",
     confirm=True,
-    description="Book a client for one service at a start time; Booksy checks the slot first.",
+    description="Book a client for one or more services at a start time; Booksy checks the slots first.",
     details=(
-        "Books one client card for one service. The end follows the service's duration. Booksy's dry run checks "
-        "the staff member is free first; a busy slot is refused, never double-booked. The client gets Booksy's "
+        "Books one client card for service_id, or for several services in one appointment, each with its own "
+        "staff member, back to back from start. Each end follows the service's duration. Booksy's dry run checks "
+        "every staff member is free first; a busy slot is refused, never double-booked. The client gets Booksy's "
         "confirmation only with notify_client. dry_run returns the same answer with saved false and keeps nothing."
     ),
     input_schema=INPUT_SCHEMA,

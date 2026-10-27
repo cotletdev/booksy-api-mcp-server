@@ -283,8 +283,8 @@ IDs come from the list tools: `service_id` from `list_services`, `staff_id` from
 | `list_appointments` | read | `GET /appointments` | Appointments in a date range with client, service, staff, time and status. |
 | `get_appointment` | read | `GET /appointments/{appointment_id}` | One appointment: services, staff, times, price, client and notes. |
 | `find_open_slots` | read | `GET /services/{service_id}/open-slots` | Free start times for a service on one day, from working hours, bookings, blocks and time off. |
-| `create_appointment` | write | `POST /clients/{client_id}/appointments` | Book a client for one service at a start time; Booksy checks the slot first. |
-| `reschedule_appointment` | write | `POST /appointments/{appointment_id}/reschedule` | Move an appointment to a new start time, and optionally to another staff member. |
+| `create_appointment` | write | `POST /clients/{client_id}/appointments` | Book a client for one or more services at a start time; Booksy checks the slots first. |
+| `reschedule_appointment` | write | `POST /appointments/{appointment_id}/reschedule` | Change an appointment: a new start time, another staff member, or other services. |
 | `cancel_appointment` | write | `POST /appointments/{appointment_id}/cancel` | Cancel an appointment and free its time in the calendar. |
 
 ### Time off

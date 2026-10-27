@@ -16,6 +16,9 @@ from booksy_api_mcp.core.errors import AuthExpiredError, ErrorCode, ToolError
 if TYPE_CHECKING:
     from booksy_api_mcp.core.context import ToolContext
 
+# A stats request sent again after a timeout: Booksy's first count of a period can take three of them.
+STATS_ATTEMPTS = 3
+
 
 def _signed_in(ctx: ToolContext) -> Session:
     s = session(ctx)
@@ -59,6 +62,20 @@ async def business_api(
         kwargs["params"] = {k: v for k, v in params.items() if v is not None}
     if payload is not None:
         kwargs["json"] = payload
+    # Booksy computes a period's stats on its first request for 30-65 s, past our 30 s, and keeps the result:
+    # once done, the same request answers in under a second (22.10.2026).
+    attempts = STATS_ATTEMPTS if stats and method == "GET" else 1
+    for attempt in range(1, attempts):
+        try:
+            return await _answer(ctx, method, url, kwargs)
+        except ToolError as exc:
+            if exc.code != ErrorCode.TARGET_ERROR or "Timeout" not in str(exc):
+                raise
+            ctx.log.info("Booksy stats timed out, asking again", attempt=attempt)
+    return await _answer(ctx, method, url, kwargs)
+
+
+async def _answer(ctx: ToolContext, method: str, url: str, kwargs: dict[str, Any]) -> Any:
     response = await ctx.call(method, url, **kwargs)
     if response.status >= 400:
         try:

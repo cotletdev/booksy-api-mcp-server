@@ -7,6 +7,7 @@ kind of client as your browser. Only the app's hosts (`app.DOMAINS`) are reachab
 from __future__ import annotations
 
 import json as jsonlib
+import logging
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -97,10 +98,31 @@ class Profile:
     local_storage: dict[str, dict[str, str]] = field(default_factory=dict)
 
 
+class Log:
+    """`ctx.log.info("event", key=value)` as the tools write it, sent to Python's `logging`."""
+
+    def __init__(self) -> None:
+        self._logger = logging.getLogger("booksy_api_mcp")
+
+    def _emit(self, level: int, event: str, fields: dict[str, Any]) -> None:
+        extra = " ".join(f"{k}={v}" for k, v in fields.items())
+        self._logger.log(level, f"{event} {extra}".strip())
+
+    def debug(self, event: str, **fields: Any) -> None:
+        self._emit(logging.DEBUG, event, fields)
+
+    def info(self, event: str, **fields: Any) -> None:
+        self._emit(logging.INFO, event, fields)
+
+    def warning(self, event: str, **fields: Any) -> None:
+        self._emit(logging.WARNING, event, fields)
+
+
 @dataclass
 class ToolContext:
     session: Session
     timeout_s: float = 30.0
+    log: Log = field(default_factory=Log, repr=False)
     _cache: dict[str, tuple[float, str]] = field(default_factory=dict, repr=False)
     _http: AsyncSession | None = field(default=None, repr=False)
 

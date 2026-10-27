@@ -62,6 +62,8 @@ EXAMPLE_SECTION: dict[str, Any] = {
     ),
     input_schema=INPUT_SCHEMA,
     route="GET /reports/{category}",
+    # A first count of a period takes Booksy up to 65 s (engagement.STATS_ATTEMPTS).
+    timeout_s=120,
     example_response={
         "category": "staff_members",
         "from": "2026-10-05",
