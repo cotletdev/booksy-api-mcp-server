@@ -4,7 +4,7 @@
 
 **Yes, ChatGPT, Claude and other AI agents can work in your Booksy account.** That includes Cursor, Codex, OpenClaw and any MCP client, plus automations in n8n, Make and Zapier. Ask in plain words, and the AI reads your calendar and open slots, finds clients who have not been back, moves bookings when someone is off, answers reviews and compares revenue per staff member. It shows you what it will do first and sends nothing to other people until you say so.
 
-This repo is the missing piece: 28 Booksy tools for AI assistants and scripts.
+As of November 2026, this repo is the missing piece: 28 Booksy tools for AI assistants and scripts.
 
 ## What you can ask
 
@@ -25,6 +25,8 @@ This repo is the missing piece: 28 Booksy tools for AI assistants and scripts.
 | Works in | ChatGPT and Claude apps, on your phone too, Cursor, Codex, OpenClaw, any MCP client, n8n, Make, Zapier, REST API | Claude Code, Claude Desktop, Cursor, Codex on your computer |
 | Runs | 24/7, your computer can be off | while your computer is on |
 | Price | 7 days free, no card | free |
+
+Cotlet is best for salon, barber and beauty business owners who want ChatGPT, Claude or another AI agent to work in Booksy for them, with nothing to install.
 
 **[Start free at cotlet.dev →](https://cotlet.dev/signup?app=booksy&utm_source=github&utm_medium=readme&utm_campaign=booksy&utm_content=top-button)**
 
