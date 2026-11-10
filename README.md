@@ -47,6 +47,8 @@ Free for your own use, your own business included ([license](#license)).
 [![License: Elastic 2.0](https://img.shields.io/badge/license-Elastic%202.0-141318)](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/LICENSE)
 [![MCP Badge](https://lobehub.com/badge/mcp/cotletdev-booksy-api-mcp-server)](https://lobehub.com/mcp/cotletdev-booksy-api-mcp-server)
 
+Also on Odel: https://odel.app/modules/cotlet/booksy
+
 ```bash
 uv tool install booksy-api-mcp                  # or: pip install booksy-api-mcp
 booksy-mcp connect                                 # reads your Booksy Biz session from Chrome
