@@ -1,4 +1,4 @@
-# Booksy API and MCP server: connect Booksy to ChatGPT and Claude
+# Booksy API integration and MCP server: connect Booksy to ChatGPT and Claude
 
 <!-- mcp-name: dev.cotlet/booksy -->
 
@@ -22,13 +22,61 @@ As of November 2026, this repo is the missing piece: 28 Booksy tools for AI assi
 |---|---|---|
 | For | salon, barber and beauty business owners | developers |
 | Setup | sign in to Booksy once, about 5 minutes, nothing to install | Python and a terminal |
-| Works in | ChatGPT and Claude apps, on your phone too, Cursor, Codex, OpenClaw, any MCP client, n8n, Make, Zapier, REST API | Claude Code, Claude Desktop, Cursor, Codex on your computer |
+| Works in | ChatGPT and Claude apps, on your phone too, Cursor, Codex, OpenClaw, any MCP client, n8n, Make, Zapier, your own API endpoints (Custom API) | Claude Code, Claude Desktop, Cursor, Codex on your computer |
 | Runs | 24/7, your computer can be off | while your computer is on |
 | Price | 7 days free, no card | free |
 
 Cotlet is best for salon, barber and beauty business owners who want ChatGPT, Claude or another AI agent to work in Booksy for them, with nothing to install.
 
 **[Start free at cotlet.dev →](https://cotlet.dev/signup?app=booksy&utm_source=github&utm_medium=readme&utm_campaign=booksy&utm_content=top-button)**
+
+## What barbers, salon owners and beauty pros ask their AI to do in Booksy
+
+| Job | Ask your AI | Make it repeat |
+|---|---|---|
+| Tomorrow's confirmations | "List tomorrow's appointments with client phone numbers and draft a WhatsApp confirmation for each. Send nothing yet." | Daily |
+| Empty slots tomorrow | "Which slots are empty tomorrow per barber, and which regular clients could take them?" | Daily |
+| Clients who stopped booking | "Find clients who have not rebooked in 6 weeks and draft a message for each." | Weekly |
+| No-shows and deposits | "List this month's no-shows and failed cancellation fees, and the clients I should ask for a deposit." | Monthly |
+| Boost clients to dispute | "List this month's Boost charges and mark the clients who were already mine, so I can claim them back." | Monthly |
+| Review requests | "List today's checked-out clients and draft a Google review request for each." | Daily |
+| Staff commission for payroll | "Download last week's sales per staff member with commission and tips for payroll." | Weekly |
+| Income for your accountant | "Export this month's income, fees and tips to a spreadsheet for my accountant." | Monthly |
+| Bulk price change | "Raise all fade services by $5 and show me the new prices before you save." | When prices change |
+| Appointments in a spreadsheet | "Put each day's appointments in my Google Sheet." | Your own endpoint, called from Google Sheets |
+| Client list out | "Export my full client list with phone numbers and visit history to a spreadsheet." | When you need it, or before you switch |
+
+Your AI asks you before it sends, books or changes anything. Payments stay in your hands: Cotlet refuses payments.
+
+## Your own Booksy API, built with Cotlet (hosted)
+
+Booksy gives business owners no API key: its API is for partners only. With Cotlet you build your own: your AI does the job once in your Cloud Browser, you save it as an endpoint, and you call it from Google Sheets, WhatsApp tools, QuickBooks, Zapier, Make, n8n, your own code.
+
+Examples you can build in a few minutes (none of them exists until you build it):
+
+| Endpoint you build | What it returns or does |
+|---|---|
+| `appointments-for-day` | appointments for a date with client, phone, service and staff |
+| `open-slots` | empty slots per staff member for a date |
+| `lapsed-clients` | clients with no booking for the weeks you name |
+| `no-shows` | no-shows and late cancellations with the fee status |
+| `boost-clients` | Boost-charged clients for a period, with their first visit |
+| `block-time` | blocks a time on a staff member's calendar (writes only after you allow it) |
+
+Call it with your Cotlet API key, JSON in and JSON out:
+
+```bash
+curl -X POST https://cotlet.dev/api/v1/custom/appointments-for-day \
+  -H "Authorization: Bearer $COTLET_API_KEY" -H "Content-Type: application/json" -d '{}'
+```
+
+Limits: one call runs up to 90 seconds, writes wait for your consent, payments are blocked. Start here: https://cotlet.dev/app/custom-api/new?app=booksy
+
+## Find it on Cotlet.dev
+
+- [Booksy MCP server on Cotlet.dev](https://cotlet.dev/integrations/booksy-api-mcp-server?utm_source=github&utm_medium=readme&utm_campaign=booksy&utm_content=old-repo)
+- [Booksy API with Cotlet](https://cotlet.dev/integrations/api/booksy?utm_source=github&utm_medium=readme&utm_campaign=booksy&utm_content=old-repo)
+- [Does Booksy have an API or MCP server?](https://cotlet.dev/api-mcp-status/booksy?utm_source=github&utm_medium=readme&utm_campaign=booksy&utm_content=old-repo)
 
 ## Run it yourself
 
@@ -37,7 +85,7 @@ A **Booksy API** and a **Booksy MCP server** you run on your own computer, in Py
 Booksy has no self-serve API for business owners and no official MCP server. This repo gives you both:
 
 - **MCP server** for Claude Code, Claude Desktop, Cursor, Codex and any MCP client, over stdio or HTTP. [Setup](#mcp-server)
-- **REST API** on `http://127.0.0.1:8787/api/v1/booksy`, with OpenAPI docs at `/docs`. [Setup](#rest-api)
+- **REST API** on `http://127.0.0.1:8787/api/v1/booksy`, with OpenAPI docs at `/docs`. [Setup](#rest-api-local-this-repo)
 - **Python**: `call("list_appointments", {"from": "2026-10-27", "to": "2026-10-27"})`, plus 9 ready scripts in [`examples/`](https://github.com/cotletdev/booksy-api-mcp-server/blob/main/examples/).
 
 Free for your own use, your own business included ([license](#license)).
@@ -64,7 +112,7 @@ claude mcp add booksy -- uvx booksy-api-mcp mcp
 - [Install](#install)
 - [Connect your Chrome](#connect-your-chrome)
 - [MCP server](#mcp-server)
-- [REST API](#rest-api)
+- [REST API](#rest-api-local-this-repo)
 - [Python and the example scripts](#python-and-the-example-scripts)
 - [All 28 tools](#all-28-tools)
 - [Configuration](#configuration)
@@ -76,14 +124,32 @@ claude mcp add booksy -- uvx booksy-api-mcp mcp
 
 ## Questions from Booksy users
 
-**Does Booksy have an API?**
-Not one a business owner can use. Booksy runs a partner API whose docs at docs.booksy.com ask for a login, so you cannot get keys for your own account (checked 11 Oct 2026). Stats & Reports and Message Blasts are not among its public areas. This repo and [Cotlet](https://cotlet.dev/integrations/booksy-api-mcp-server?utm_source=github&utm_medium=readme&utm_campaign=booksy&utm_content=faq-api) give you 28 Booksy tools as a REST API and an MCP server.
+**Does Booksy have an API or a Zapier app?**
+
+Booksy's API is for partners only, and Booksy has no Zapier or Make app (checked 23 Nov 2026). With Cotlet you build your own endpoints in your signed-in Booksy Biz account and call them from Google Sheets, Zapier, Make or n8n.
+
+**Is the Booksy app in ChatGPT for business owners?**
+
+No. Booksy's ChatGPT app is for clients who want to book. Cotlet lets your own ChatGPT or Claude work in your Booksy Biz account for you.
+
+**Can AI send my Booksy clients a confirmation every morning?**
+
+Your AI lists tomorrow's appointments with phone numbers and drafts each confirmation. You send them, or your own endpoint hands them to your WhatsApp tool.
+
+**Can AI tell me which Booksy Boost clients were really mine?**
+
+Yes. It lists the month's Boost charges and marks the clients who visited you before, so you know which charges to dispute.
+
+**Can AI find Booksy clients who stopped booking?**
+
+Yes. It lists clients with no booking for the weeks you choose and drafts a message for each. Nothing goes out until you say yes.
+
+**How do I export my Booksy client list without emailing support?**
+
+Your AI reads your clients with phone numbers and visit history from the screens your login opens and saves them to a spreadsheet.
 
 **Can I get a Booksy API key?**
 Not from Booksy for your own account. With Cotlet you get your own API key that works with your Booksy account, for scripts, n8n, Make, Zapier or any HTTP client. This repo needs no key: it runs on your computer, on your own Booksy session.
-
-**Is there an official ChatGPT integration for Booksy?**
-Booksy has a ChatGPT app for clients: it finds pros and books open slots. It does not run your business. Cotlet connects your Booksy Biz account to ChatGPT, Claude and other AI agents: your calendar, clients, staff, reviews, Message Blasts and stats.
 
 **How do I connect Booksy to ChatGPT?**
 Sign up at [cotlet.dev](https://cotlet.dev/signup?app=booksy&utm_source=github&utm_medium=readme&utm_campaign=booksy&utm_content=faq-chatgpt), sign in to Booksy once in your Cloud Browser there, and add Cotlet to ChatGPT, following the steps in your account. Then ask ChatGPT about your Booksy like you would ask an assistant. ChatGPT needs a server on the internet, so this repo alone, running on your computer, does not connect to ChatGPT.
@@ -269,7 +335,7 @@ Then ask your agent things like:
 >
 > *Which clients have not been in for 60 days and have nothing booked?*
 
-## REST API
+## REST API (local, this repo)
 
 ```bash
 booksy-mcp serve                   # http://127.0.0.1:8787, MCP at /mcp, docs at /docs
@@ -458,7 +524,7 @@ The REST API answers `{"error": "<code>", "message": "..."}`. The MCP server ret
 | Booksy session | your Chrome, saved in a local file | your own Cloud Browser in the EU, profile encrypted with AES-256-GCM |
 | When Booksy changes its panel | `git pull` once we have fixed it | fixed for you, every tool tested daily |
 | Approvals | your MCP client asks per call | bookings, reschedules, replies and blasts wait for your OK, switchable per tool |
-| Works with | MCP clients on your machine, local scripts | Claude.ai and ChatGPT connectors, n8n, Make, Zapier, any HTTP client |
+| Works with | MCP clients on your machine, local scripts | Claude.ai and ChatGPT connectors, n8n, Make, Zapier, any HTTP client through your own endpoints (Custom API) |
 | Who may use it | you and your own business | you, teams, businesses, agencies |
 | Price | free | free 7-day trial with 2,000 credits, no card; then one-time packs from $29 for 5,000 credits |
 
